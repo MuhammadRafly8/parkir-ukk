@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id_user      Int      @id @default(autoincrement())
+  nama_lengkap String   @db.VarChar(50)
+  username     String   @unique @db.VarChar(50)
+  password     String   @db.VarChar(100)
+  role         Role     @default(PETUGAS)
+  status_aktif Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  kendaraan    Kendaraan[]
+  transaksi    Transaksi[]
+  logAktivitas LogAktivitas[]
+}
+
+model AreaParkir {
+  id_area    Int      @id @default(autoincrement())
+  nama_area  String   @db.VarChar(50) @unique 
+  kapasitas  Int      @default(0)
+  terisi     Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  transaksi Transaksi[]
+}
+
+model Kendaraan {
+  id_kendaraan    Int            @id @default(autoincrement())
+  plat_nomor      String         @unique @db.VarChar(15)
+  jenis_kendaraan JenisKendaraan
+  warna           String         @db.VarChar(20)
+  pemilik         String         @db.VarChar(100)
+  id_user         Int
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  user      User        @relation(fields: [id_user], references: [id_user])
+  transaksi Transaksi[]
+}
+
+model Tarif {
+  id_tarif        Int            @id @default(autoincrement())
+  jenis_kendaraan JenisKendaraan @unique
+  tarif_per_jam   Decimal        @db.Decimal(10, 0)
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  transaksi Transaksi[]
+}
+
+model Transaksi {
+  id_parkir    Int             @id @default(autoincrement())
+  id_kendaraan Int
+  waktu_masuk  DateTime
+  waktu_keluar DateTime?
+  id_tarif     Int
+  durasi_jam   Int?            @default(0)
+  biaya_total  Decimal?        @db.Decimal(10, 0)
+  status       StatusTransaksi @default(MASUK)
+  id_user      Int
+  id_area      Int
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+
+  kendaraan  Kendaraan  @relation(fields: [id_kendaraan], references: [id_kendaraan])
+  tarif      Tarif      @relation(fields: [id_tarif], references: [id_tarif])
+  user       User       @relation(fields: [id_user], references: [id_user])
+  areaParkir AreaParkir @relation(fields: [id_area], references: [id_area])
+
+  @@index([waktu_masuk])
+  @@index([status])
+}
+
+model LogAktivitas {
+  id_log          Int      @id @default(autoincrement())
+  id_user         Int
+  aktivitas       String   @db.VarChar(100)
+  waktu_aktivitas DateTime @default(now())
+
+  user User @relation(fields: [id_user], references: [id_user])
+}
+
+enum Role {
+  ADMIN
+  PETUGAS
+  OWNER
+}
+
+enum JenisKendaraan {
+  MOTOR
+  MOBIL
+  LAINNYA
+}
+
+enum StatusTransaksi {
+  MASUK
+  KELUAR
+}
