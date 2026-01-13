@@ -82,6 +82,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Kendaraan tidak ditemukan' }, { status: 404 })
     }
 
+    // Cek apakah ada transaksi yang mereferensi kendaraan ini
+    const transaksiCount = await prisma.transaksi.count({
+      where: { id_kendaraan: parseInt(id) },
+    })
+
+    if (transaksiCount > 0) {
+      return NextResponse.json(
+        { error: 'Kendaraan memiliki transaksi terkait. Hapus transaksi terlebih dahulu.' },
+        { status: 400 }
+      )
+    }
+
     await prisma.kendaraan.delete({
       where: { id_kendaraan: parseInt(id) },
     })

@@ -13,7 +13,7 @@ async function getSession() {
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession()
-    if (!session || session.role !== 'ADMIN') {
+    if (!session || (session.role !== 'ADMIN' && session.role !== 'PETUGAS')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
