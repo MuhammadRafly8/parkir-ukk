@@ -25,14 +25,24 @@ export default function MasukPage() {
   const [success, setSuccess] = useState('')
   const [tiketData, setTiketData] = useState<any>(null)
   const [selectedArea, setSelectedArea] = useState('')
-  const [foundKendaraan, setFoundKendaraan] = useState<any>(null)
+  
+  const [allKendaraan, setAllKendaraan] = useState<any[]>([])
+  const [modalKendaraan, setModalKendaraan] = useState<any | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalSubmitting, setModalSubmitting] = useState(false)
 
   // New refs & states for QR conversion and scanning
   const qrSvgRef = useRef<SVGSVGElement | null>(null)
   const [searchInput, setSearchInput] = useState('')
 
   useEffect(() => {
-    fetchAreas()
+    // fetch areas and all kendaraan in parallel
+    const bootstrap = async () => {
+      setLoading(true)
+      await Promise.all([fetchAreas(), fetchAllKendaraan()])
+      setLoading(false)
+    }
+    bootstrap()
   }, [])
 
   const fetchAreas = async () => {
@@ -45,7 +55,19 @@ export default function MasukPage() {
     } catch (error) {
       console.error('Error fetching areas:', error)
     } finally {
-      setLoading(false)
+      // loading handled by bootstrap
+    }
+  }
+
+  const fetchAllKendaraan = async () => {
+    try {
+      const res = await fetch('/api/kendaraan')
+      if (res.ok) {
+        const data = await res.json()
+        setAllKendaraan(data)
+      }
+    } catch (err) {
+      console.error('Error fetching kendaraan list:', err)
     }
   }
 
@@ -53,16 +75,17 @@ export default function MasukPage() {
   const handleSearch = async (platNomor: string) => {
     setLoading(true)
     setError('')
-    setFoundKendaraan(null)
     setTiketData(null)
 
     try {
       const res = await fetch(`/api/kendaraan?plat_nomor=${encodeURIComponent(platNomor)}`)
       const data = await res.json()
 
-      if (res.ok && Array.isArray(data) && data.length > 0) {
-        setFoundKendaraan(data[0])
+      if (res.ok && Array.isArray(data)) {
+        // replace the displayed list with server-filtered results
+        setAllKendaraan(data)
       } else {
+        setAllKendaraan([])
         setError(data.error || 'Kendaraan tidak ditemukan')
       }
     } catch (err) {
@@ -73,26 +96,32 @@ export default function MasukPage() {
     }
   }
 
-  const handleCetakTiket = async () => {
-    if (!foundKendaraan) {
-      setError('Cari kendaraan terlebih dahulu')
-      return
-    }
+  const handleResetSearch = async () => {
+    setSearchInput('')
+    setLoading(true)
+    await fetchAllKendaraan()
+    setLoading(false)
+  }
+
+
+  // Cetak tiket flow from modal (clicking a listed kendaraan)
+  const handleCetakTiketFromModal = async () => {
+    if (!modalKendaraan) return
     if (!selectedArea) {
       setError('Pilih area parkir terlebih dahulu')
       return
     }
 
-    setSubmitting(true)
+    setModalSubmitting(true)
     setError('')
     setSuccess('')
 
     try {
       const payload = {
-        plat_nomor: foundKendaraan.plat_nomor,
-        jenis_kendaraan: foundKendaraan.jenis_kendaraan,
-        warna: foundKendaraan.warna,
-        pemilik: foundKendaraan.pemilik,
+        plat_nomor: modalKendaraan.plat_nomor,
+        jenis_kendaraan: modalKendaraan.jenis_kendaraan,
+        warna: modalKendaraan.warna,
+        pemilik: modalKendaraan.pemilik,
         id_area: selectedArea,
       }
 
@@ -107,17 +136,19 @@ export default function MasukPage() {
       if (res.ok) {
         setSuccess('Kendaraan berhasil dicatat masuk')
         setTiketData(data)
-        setFoundKendaraan(null)
+        setModalKendaraan(null)
+        setModalOpen(false)
         setSelectedArea('')
         fetchAreas()
+        fetchAllKendaraan()
       } else {
         setError(data.error || 'Terjadi kesalahan')
       }
     } catch (err) {
-      console.error('Error creating transaksi masuk:', err)
+      console.error('Error creating transaksi masuk (modal):', err)
       setError('Terjadi kesalahan')
     } finally {
-      setSubmitting(false)
+      setModalSubmitting(false)
     }
   }
 
@@ -346,7 +377,7 @@ export default function MasukPage() {
                 <QRCodeSVG id="ticket-qr" value={tiketData.id_parkir.toString()} size={96} ref={qrSvgRef as any} />
                 <p className="text-xs text-gray-600 mt-2">ID: {tiketData.id_parkir}</p>
               </div>
-            </div>``
+            </div>
             <p className="text-xs text-gray-600 mt-2">Simpan tiket ini untuk keluar parkir</p>
               <div className="mt-4 flex space-x-2">
               {/* Cetak akan mengunduh PDF yang berisi QR */}
@@ -354,60 +385,89 @@ export default function MasukPage() {
               <Button onClick={() => setTiketData(null)} variant="outline">Tutup</Button>
             </div>
           </CardContent>
-        </Card>
+          </Card>
       )}
+
         <Card>
           <CardHeader>
-            <CardTitle>Cari Kendaraan</CardTitle>
+            <div className="w-full flex items-center justify-between">
+              <CardTitle>Daftar Kendaraan</CardTitle>
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={searchInput}
+                  onChange={(e) => setSearchInput((e.target as HTMLInputElement).value)}
+                  placeholder="Cari plat nomor"
+                  className="w-48"
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(searchInput) }}
+                />
+                <Button onClick={() => handleSearch(searchInput)} variant="outline">Cari</Button>
+                <Button onClick={handleResetSearch} variant="ghost">Reset</Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-2">
-              <Input
-                value={searchInput}
-                onChange={(e) => setSearchInput((e.target as HTMLInputElement).value)}
-                placeholder="Masukkan plat nomor"
-                className="flex-1"
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(searchInput) }}
-                autoFocus
-              />
-              <Button onClick={() => handleSearch(searchInput)} variant="outline">Cari</Button>
-            </div>
-
-            {loading && (
-              <div className="flex justify-center mt-4">
-                <LoadingSpinner size="lg" />
-              </div>
-            )}
-
-            {foundKendaraan && (
-              <div className="mt-4 space-y-2">
-                <p><strong>Plat Nomor:</strong> {foundKendaraan.plat_nomor}</p>
-                <p><strong>Jenis:</strong> {foundKendaraan.jenis_kendaraan}</p>
-                <p><strong>Warna:</strong> {foundKendaraan.warna}</p>
-                <p><strong>Pemilik:</strong> {foundKendaraan.pemilik}</p>
-
-                <div className="mt-2">
-                  <label className="block text-sm text-gray-600">Pilih Area</label>
-                  <select
-                    value={selectedArea}
-                    onChange={(e) => setSelectedArea(e.target.value)}
-                    className="mt-1 block w-full border rounded px-2 py-2"
+            {allKendaraan.length === 0 ? (
+              <p className="text-sm text-gray-600">Belum ada data kendaraan.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+                {allKendaraan.map((k) => (
+                  <div
+                    key={k.id_kendaraan}
+                    onClick={() => { setModalKendaraan(k); setModalOpen(true); setSelectedArea('') }}
+                    className="p-3 border rounded cursor-pointer hover:shadow-md"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { setModalKendaraan(k); setModalOpen(true) } }}
                   >
-                    <option value="">-- Pilih Area --</option>
-                    {areas.map((a) => (
-                      <option key={a.id_area} value={a.id_area}>{a.nama_area} (terisi: {a.terisi}/{a.kapasitas})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mt-4 flex space-x-2">
-                  <Button onClick={handleCetakTiket} variant="primary" isLoading={submitting}>Cetak Tiket</Button>
-                  <Button onClick={() => setFoundKendaraan(null)} variant="outline">Batal</Button>
-                </div>
+                    <p className="font-semibold">{k.plat_nomor}</p>
+                    <p className="text-sm text-gray-600">{k.jenis_kendaraan} • {k.warna}</p>
+                    <p className="text-sm text-gray-500">{k.pemilik}</p>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
+
+        {/* Modal for kendaraan details */}
+        {modalOpen && modalKendaraan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black opacity-30" onClick={() => { setModalOpen(false); setModalKendaraan(null) }} />
+            <div className="bg-white rounded shadow-lg max-w-xl w-full z-10 p-6">
+              <h3 className="text-lg font-bold mb-2">Detail Kendaraan</h3>
+              <div className="space-y-2">
+                <p><strong>Plat Nomor:</strong> {modalKendaraan.plat_nomor}</p>
+                <p><strong>Jenis:</strong> {modalKendaraan.jenis_kendaraan}</p>
+                <p><strong>Warna:</strong> {modalKendaraan.warna}</p>
+                <p><strong>Pemilik:</strong> {modalKendaraan.pemilik}</p>
+                {modalKendaraan.user && (
+                  <p><strong>Terdaftar Oleh:</strong> {modalKendaraan.user.nama_lengkap}</p>
+                )}
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm text-gray-600">Pilih Area</label>
+                <select
+                  value={selectedArea}
+                  onChange={(e) => setSelectedArea(e.target.value)}
+                  className="mt-1 block w-full border rounded px-2 py-2"
+                >
+                  <option value="">-- Pilih Area --</option>
+                  {areas.map((a) => (
+                    <option key={a.id_area} value={a.id_area}>{a.nama_area} (terisi: {a.terisi}/{a.kapasitas})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-4 flex justify-end space-x-2">
+                <Button onClick={() => { setModalOpen(false); setModalKendaraan(null) }} variant="outline">Tutup</Button>
+                <Button onClick={handleCetakTiketFromModal} isLoading={modalSubmitting} variant="primary">Cetak Tiket</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      
+        
     </div>
   )
 }

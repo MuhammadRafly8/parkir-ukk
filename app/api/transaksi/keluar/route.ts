@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id_parkir } = body
+    const { id_parkir, paymentMethod, cashAmount } = body
 
     if (!id_parkir) {
       return NextResponse.json(
@@ -59,6 +59,16 @@ export async function POST(request: NextRequest) {
     const tarifPerJam = Number(transaksi.tarif.tarif_per_jam)
     const biayaTotal = durasiJam * tarifPerJam
 
+    // Validasi pembayaran jika metode CASH
+    let kembalian = 0
+    if (paymentMethod === 'CASH') {
+      const paid = Number(cashAmount || 0)
+      if (isNaN(paid) || paid < biayaTotal) {
+        return NextResponse.json({ error: 'Jumlah cash tidak mencukupi' }, { status: 400 })
+      }
+      kembalian = paid - biayaTotal
+    }
+
     // Update transaksi
     const updatedTransaksi = await prisma.transaksi.update({
       where: { id_parkir: parseInt(id_parkir) },
@@ -88,9 +98,13 @@ export async function POST(request: NextRequest) {
       data: { terisi: { decrement: 1 } },
     })
 
+    const pembayaranInfo = paymentMethod === 'CASH'
+      ? `Pembayaran CASH, dibayar: ${cashAmount}, kembalian: ${kembalian}`
+      : `Pembayaran QRIS`
+
     await createActivityLog(
       session.id_user,
-      `Mencatat kendaraan keluar: ${transaksi.kendaraan.plat_nomor} - ${biayaTotal}`
+      `Mencatat kendaraan keluar: ${transaksi.kendaraan.plat_nomor} - ${biayaTotal}. ${pembayaranInfo}`
     )
 
     return NextResponse.json({
@@ -100,6 +114,11 @@ export async function POST(request: NextRequest) {
         tarif_per_jam: Number(updatedTransaksi.tarif.tarif_per_jam),
       },
       biaya_total: Number(updatedTransaksi.biaya_total),
+      pembayaran: {
+        paymentMethod: paymentMethod || 'QRIS',
+        cashAmount: paymentMethod === 'CASH' ? Number(cashAmount) : null,
+        kembalian,
+      },
     })
   } catch (error) {
     console.error('Error updating transaksi keluar:', error)
