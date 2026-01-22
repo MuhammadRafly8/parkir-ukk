@@ -16,6 +16,23 @@ interface Area {
   created_at: string
 }
 
+interface Vehicle {
+  id_parkir: string
+  id_area?: number
+  plat_nomor?: string
+  jenis_kendaraan?: string
+  waktu_masuk: string
+  durasi_jam?: number
+  kendaraan?: {
+    plat_nomor: string
+    jenis_kendaraan: string
+  }
+  areaParkir?: {
+    id_area: number
+    nama_area: string
+  }
+}
+
 export default function SlotsPage() {
   const [areas, setAreas] = useState<Area[]>([])
   const [loading, setLoading] = useState(true)
@@ -23,6 +40,10 @@ export default function SlotsPage() {
   const [editingArea, setEditingArea] = useState<Area | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showVehiclesModal, setShowVehiclesModal] = useState(false)
+  const [selectedAreaForVehicles, setSelectedAreaForVehicles] = useState<Area | null>(null)
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [vehiclesLoading, setVehiclesLoading] = useState(false)
   const [formData, setFormData] = useState({
     nama_area: '',
     kapasitas: '',
@@ -137,6 +158,34 @@ export default function SlotsPage() {
     setShowModal(true)
   }
 
+  const handleViewVehicles = async (area: Area) => {
+    setSelectedAreaForVehicles(area)
+    setVehiclesLoading(true)
+    setShowVehiclesModal(true)
+    
+    try {
+      const res = await fetch(`/api/transaksi/active`)
+      if (res.ok) {
+        const data = await res.json()
+        // Filter kendaraan hanya untuk area yang dipilih
+        const filteredVehicles = Array.isArray(data) 
+          ? data.filter((v: Vehicle) => {
+              const vehicleAreaId = v.id_area || v.areaParkir?.id_area
+              return vehicleAreaId === area.id_area
+            })
+          : []
+        setVehicles(filteredVehicles)
+      } else {
+        setVehicles([])
+      }
+    } catch (error) {
+      console.error('Error fetching vehicles:', error)
+      setVehicles([])
+    } finally {
+      setVehiclesLoading(false)
+    }
+  }
+
   if (loading) {
     return <LoadingSpinner size="lg" />
   }
@@ -204,6 +253,9 @@ export default function SlotsPage() {
                     <TableCell className="text-slate-400 text-sm">{formatDateTime(area.created_at)}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
+                        <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors" onClick={() => handleViewVehicles(area)}>
+                          Kendaraan
+                        </Button>
                         <Button size="sm" className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 transition-colors" onClick={() => handleEdit(area)}>
                           Edit
                         </Button>
@@ -259,6 +311,64 @@ export default function SlotsPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showVehiclesModal && selectedAreaForVehicles && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-slate-900 rounded-2xl p-6 max-w-2xl w-full border border-slate-700/50 shadow-2xl max-h-96 overflow-y-auto">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Kendaraan di Area: <span className="text-blue-400">{selectedAreaForVehicles.nama_area}</span>
+            </h2>
+            
+            {vehiclesLoading ? (
+              <div className="flex justify-center py-8">
+                <LoadingSpinner size="lg" />
+              </div>
+            ) : vehicles.length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                      <TableHeaderCell className="text-slate-300 font-semibold">ID Parkir</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold">Plat Nomor</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold">Waktu Masuk</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold">Durasi</TableHeaderCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {vehicles.map((vehicle) => {
+                      const platNomor = vehicle.plat_nomor || vehicle.kendaraan?.plat_nomor || '-'
+                      const jenisKendaraan = vehicle.jenis_kendaraan || vehicle.kendaraan?.jenis_kendaraan || '-'
+                      return (
+                        <TableRow key={vehicle.id_parkir} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                          <TableCell className="text-slate-100 font-mono text-sm">{vehicle.id_parkir}</TableCell>
+                          <TableCell className="text-slate-100 font-semibold">{platNomor}</TableCell>
+                          <TableCell className="text-slate-400">{jenisKendaraan}</TableCell>
+                          <TableCell className="text-slate-400 text-sm">{formatDateTime(vehicle.waktu_masuk)}</TableCell>
+                          <TableCell className="text-amber-400 font-semibold">{vehicle.durasi_jam ? `${vehicle.durasi_jam} jam` : '-'}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-slate-400">Tidak ada kendaraan yang parkir di area ini</p>
+              </div>
+            )}
+            
+            <div className="flex justify-end mt-6 pt-4 border-t border-slate-700/30">
+              <Button 
+                onClick={() => setShowVehiclesModal(false)}
+                className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 border border-slate-600/50"
+              >
+                Tutup
+              </Button>
             </div>
           </div>
         </div>
