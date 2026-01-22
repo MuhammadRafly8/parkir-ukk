@@ -1,10 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/Card'
 import { Button } from '@/app/components/ui/Button'
-import { Input } from '@/app/components/ui/Input'
-import { Select } from '@/app/components/ui/Select'
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell } from '@/app/components/ui/Table'
 import { LoadingSpinner } from '@/app/components/shared/LoadingSpinner'
 import { ErrorAlert } from '@/app/components/shared/ErrorAlert'
@@ -142,12 +139,15 @@ export default function TariffsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kelola Tarif Parkir</h1>
-          <p className="text-gray-600 mt-2">Manajemen tarif parkir per jam</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 backdrop-blur-xl border border-slate-700/50">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5"></div>
+        <div className="relative flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Kelola Tarif Parkir</h1>
+            <p className="text-slate-400 mt-2">Manajemen tarif parkir per jam</p>
+          </div>
+          <Button onClick={openModal} className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white border-0">Tambah Tarif</Button>
         </div>
-        <Button onClick={openModal}>Tambah Tarif</Button>
       </div>
 
       {error && (
@@ -158,29 +158,33 @@ export default function TariffsPage() {
         <SuccessAlert message={success} onClose={() => setSuccess('')} />
       )}
 
-      <Card>
-        <CardContent>
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHeaderCell>Jenis Kendaraan</TableHeaderCell>
-                <TableHeaderCell>Tarif per Jam</TableHeaderCell>
-                <TableHeaderCell>Tanggal Dibuat</TableHeaderCell>
-                <TableHeaderCell>Aksi</TableHeaderCell>
+              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                <TableHeaderCell className="text-slate-300 font-semibold">Jenis Kendaraan</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tarif per Jam</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tarifs.map((tarif) => (
-                <TableRow key={tarif.id_tarif}>
-                  <TableCell>{tarif.jenis_kendaraan}</TableCell>
-                  <TableCell>{formatCurrency(tarif.tarif_per_jam)}</TableCell>
-                  <TableCell>{formatDateTime(tarif.created_at)}</TableCell>
+                <TableRow key={tarif.id_tarif} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell>
+                    <span className="px-3 py-1 rounded bg-amber-500/20 text-amber-300 text-sm font-medium border border-amber-500/30">
+                      {tarif.jenis_kendaraan}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-100 font-semibold">{formatCurrency(tarif.tarif_per_jam)}</TableCell>
+                  <TableCell className="text-slate-400 text-sm">{formatDateTime(tarif.created_at)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(tarif)}>
+                      <Button size="sm" className="bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 transition-colors" onClick={() => handleEdit(tarif)}>
                         Edit
                       </Button>
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(tarif.id_tarif)}>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(tarif.id_tarif)}>
                         Hapus
                       </Button>
                     </div>
@@ -189,46 +193,54 @@ export default function TariffsPage() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">
-              {editingTarif ? 'Edit Tarif' : 'Tambah Tarif'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Select
-                label="Jenis Kendaraan"
-                value={formData.jenis_kendaraan}
-                onChange={(e) => setFormData({ ...formData, jenis_kendaraan: e.target.value })}
-                options={[
-                  { value: 'MOTOR', label: 'Motor' },
-                  { value: 'MOBIL', label: 'Mobil' },
-                  { value: 'LAINNYA', label: 'Lainnya' },
-                ]}
-                required
-                disabled={!!editingTarif}
-              />
-              <Input
-                label="Tarif per Jam"
-                type="number"
-                value={formData.tarif_per_jam}
-                onChange={(e) => setFormData({ ...formData, tarif_per_jam: e.target.value })}
-                required
-                min="0"
-                step="1000"
-              />
-              <div className="flex space-x-4">
-                <Button type="submit" variant="primary" className="flex-1">
-                  {editingTarif ? 'Update' : 'Tambah'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => { setShowModal(false); resetForm(); }}>
-                  Batal
-                </Button>
-              </div>
-            </form>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-md w-full border border-slate-700/50 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 rounded-2xl"></div>
+            <div className="relative">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {editingTarif ? 'Edit Tarif' : 'Tambah Tarif'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Jenis Kendaraan</label>
+                  <select
+                    value={formData.jenis_kendaraan}
+                    onChange={(e) => setFormData({ ...formData, jenis_kendaraan: e.target.value })}
+                    disabled={!!editingTarif}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
+                    required
+                  >
+                    <option value="MOTOR">Motor</option>
+                    <option value="MOBIL">Mobil</option>
+                    <option value="LAINNYA">Lainnya</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Tarif per Jam</label>
+                  <input
+                    type="number"
+                    value={formData.tarif_per_jam}
+                    onChange={(e) => setFormData({ ...formData, tarif_per_jam: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                    required
+                    min="0"
+                    step="1000"
+                  />
+                </div>
+                <div className="flex space-x-4 pt-4">
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium py-2 rounded-lg transition-all">
+                    {editingTarif ? 'Update' : 'Tambah'}
+                  </button>
+                  <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-lg transition-all border border-slate-600/50">
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

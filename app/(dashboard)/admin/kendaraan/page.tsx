@@ -1,10 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/Card'
 import { Button } from '@/app/components/ui/Button'
-import { Input } from '@/app/components/ui/Input'
-import { Select } from '@/app/components/ui/Select'
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell } from '@/app/components/ui/Table'
 import { LoadingSpinner } from '@/app/components/shared/LoadingSpinner'
 import { ErrorAlert } from '@/app/components/shared/ErrorAlert'
@@ -206,12 +203,15 @@ export default function KendaraanPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kelola Kendaraan</h1>
-          <p className="text-gray-600 mt-2">Manajemen data kendaraan</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 backdrop-blur-xl border border-slate-700/50">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5"></div>
+        <div className="relative flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Kelola Kendaraan</h1>
+            <p className="text-slate-400 mt-2">Manajemen data kendaraan</p>
+          </div>
+          <Button onClick={openModal} className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0">Tambah Kendaraan</Button>
         </div>
-        <Button onClick={openModal}>Tambah Kendaraan</Button>
       </div>
 
       {error && (
@@ -222,44 +222,48 @@ export default function KendaraanPage() {
         <SuccessAlert message={success} onClose={() => setSuccess('')} />
       )}
 
-      <Card>
-        <CardHeader>
-          <Input
-            label="Cari Plat Nomor"
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-slate-700/50">
+          <input
+            type="text"
             value={searchPlat}
             onChange={(e) => setSearchPlat(e.target.value)}
-            placeholder="Masukkan plat nomor..."
-            className="max-w-md"
+            placeholder="Cari plat nomor..."
+            className="w-full max-w-md bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
           />
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHeaderCell>Plat Nomor</TableHeaderCell>
-                <TableHeaderCell>Jenis</TableHeaderCell>
-                <TableHeaderCell>Warna</TableHeaderCell>
-                <TableHeaderCell>Pemilik</TableHeaderCell>
-                <TableHeaderCell>User</TableHeaderCell>
-                <TableHeaderCell>Tanggal Dibuat</TableHeaderCell>
-                <TableHeaderCell>Aksi</TableHeaderCell>
+              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                <TableHeaderCell className="text-slate-300 font-semibold">Plat Nomor</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Warna</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Pemilik</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">User</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
               </TableRow>
             </TableHeader>
             <TableBody>
               {kendaraan.map((k) => (
-                <TableRow key={k.id_kendaraan}>
-                  <TableCell className="font-medium">{k.plat_nomor}</TableCell>
-                  <TableCell>{k.jenis_kendaraan}</TableCell>
-                  <TableCell>{k.warna}</TableCell>
-                  <TableCell>{k.pemilik}</TableCell>
-                  <TableCell>{k.user?.nama_lengkap || '-'}</TableCell>
-                  <TableCell>{formatDateTime(k.created_at)}</TableCell>
+                <TableRow key={k.id_kendaraan} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell className="text-slate-100 font-mono font-semibold">{k.plat_nomor}</TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 rounded bg-slate-800/50 text-slate-300 text-xs font-medium">
+                      {k.jenis_kendaraan}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-400">{k.warna}</TableCell>
+                  <TableCell className="text-slate-100">{k.pemilik}</TableCell>
+                  <TableCell className="text-slate-400">{k.user?.nama_lengkap || '-'}</TableCell>
+                  <TableCell className="text-slate-400 text-sm">{formatDateTime(k.created_at)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(k)}>
+                      <Button size="sm" className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 transition-colors" onClick={() => handleEdit(k)}>
                         Edit
                       </Button>
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(k.id_kendaraan)}>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(k.id_kendaraan)}>
                         Hapus
                       </Button>
                     </div>
@@ -268,67 +272,87 @@ export default function KendaraanPage() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">
-              {editingKendaraan ? 'Edit Kendaraan' : 'Tambah Kendaraan'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Plat Nomor"
-                value={formData.plat_nomor}
-                onChange={(e) => setFormData({ ...formData, plat_nomor: e.target.value.toUpperCase() })}
-                required
-              />
-              <Select
-                label="Jenis Kendaraan"
-                value={formData.jenis_kendaraan}
-                onChange={(e) => setFormData({ ...formData, jenis_kendaraan: e.target.value })}
-                options={[
-                  { value: 'MOTOR', label: 'Motor' },
-                  { value: 'MOBIL', label: 'Mobil' },
-                  { value: 'LAINNYA', label: 'Lainnya' },
-                ]}
-                required
-              />
-              <Input
-                label="Warna"
-                value={formData.warna}
-                onChange={(e) => setFormData({ ...formData, warna: e.target.value })}
-                required
-              />
-              <Input
-                label="Pemilik"
-                value={formData.pemilik}
-                onChange={(e) => setFormData({ ...formData, pemilik: e.target.value })}
-                required
-              />
-              <Select
-                label="User"
-                value={formData.id_user}
-                onChange={(e) => setFormData({ ...formData, id_user: e.target.value })}
-                options={[
-                  { value: '', label: 'Pilih User...' },
-                  ...users.map((user) => ({
-                    value: user.id_user.toString(),
-                    label: `${user.nama_lengkap} (${user.username})`,
-                  })),
-                ]}
-                required
-              />
-              <div className="flex space-x-4">
-                <Button type="submit" variant="primary" className="flex-1">
-                  {editingKendaraan ? 'Update' : 'Tambah'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => { setShowModal(false); resetForm(); }}>
-                  Batal
-                </Button>
-              </div>
-            </form>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto border border-slate-700/50 shadow-2xl">
+            <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-teal-500/5 rounded-2xl"></div>
+            <div className="relative">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {editingKendaraan ? 'Edit Kendaraan' : 'Tambah Kendaraan'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Plat Nomor</label>
+                  <input
+                    type="text"
+                    value={formData.plat_nomor}
+                    onChange={(e) => setFormData({ ...formData, plat_nomor: e.target.value.toUpperCase() })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Jenis Kendaraan</label>
+                  <select
+                    value={formData.jenis_kendaraan}
+                    onChange={(e) => setFormData({ ...formData, jenis_kendaraan: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  >
+                    <option value="MOTOR">Motor</option>
+                    <option value="MOBIL">Mobil</option>
+                    <option value="LAINNYA">Lainnya</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Warna</label>
+                  <input
+                    type="text"
+                    value={formData.warna}
+                    onChange={(e) => setFormData({ ...formData, warna: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Pemilik</label>
+                  <input
+                    type="text"
+                    value={formData.pemilik}
+                    onChange={(e) => setFormData({ ...formData, pemilik: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">User</label>
+                  <select
+                    value={formData.id_user}
+                    onChange={(e) => setFormData({ ...formData, id_user: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  >
+                    <option value="">Pilih User...</option>
+                    {users.map((user) => (
+                      <option key={user.id_user} value={user.id_user.toString()}>
+                        {user.nama_lengkap} ({user.username})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex space-x-4 pt-4">
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium py-2 rounded-lg transition-all">
+                    {editingKendaraan ? 'Update' : 'Tambah'}
+                  </button>
+                  <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-lg transition-all border border-slate-600/50">
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

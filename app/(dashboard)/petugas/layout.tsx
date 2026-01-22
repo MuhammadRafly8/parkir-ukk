@@ -36,11 +36,21 @@ export default function PetugasLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar navItems={navItems} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex flex-col sm:flex-row min-h-screen bg-slate-900">
+      {/* Sidebar - Fixed on desktop, overlay on mobile */}
+      <div className="hidden sm:block sm:w-64 sm:flex-shrink-0">
+        <Sidebar navItems={navItems} />
+      </div>
+      
+      {/* Mobile Sidebar */}
+      <div className="sm:hidden">
+        <Sidebar navItems={navItems} />
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-screen w-full overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

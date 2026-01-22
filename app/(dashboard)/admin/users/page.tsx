@@ -1,10 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/Card'
 import { Button } from '@/app/components/ui/Button'
-import { Input } from '@/app/components/ui/Input'
-import { Select } from '@/app/components/ui/Select'
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell } from '@/app/components/ui/Table'
 import { LoadingSpinner } from '@/app/components/shared/LoadingSpinner'
 import { ErrorAlert } from '@/app/components/shared/ErrorAlert'
@@ -137,12 +134,15 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Kelola User</h1>
-          <p className="text-gray-600 mt-2">Manajemen pengguna sistem</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 backdrop-blur-xl border border-slate-700/50">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5"></div>
+        <div className="relative flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Kelola User</h1>
+            <p className="text-slate-400 mt-2">Manajemen pengguna sistem</p>
+          </div>
+          <Button onClick={openModal} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0">Tambah User</Button>
         </div>
-        <Button onClick={openModal}>Tambah User</Button>
       </div>
 
       {error && (
@@ -153,41 +153,51 @@ export default function UsersPage() {
         <SuccessAlert message={success} onClose={() => setSuccess('')} />
       )}
 
-      <Card>
-        <CardContent>
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHeaderCell>Nama Lengkap</TableHeaderCell>
-                <TableHeaderCell>Username</TableHeaderCell>
-                <TableHeaderCell>Role</TableHeaderCell>
-                <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Tanggal Dibuat</TableHeaderCell>
-                <TableHeaderCell>Aksi</TableHeaderCell>
+              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                <TableHeaderCell className="text-slate-300 font-semibold">Nama Lengkap</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Username</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Role</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Status</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id_user}>
-                  <TableCell>{user.nama_lengkap}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                <TableRow key={user.id_user} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell className="text-slate-100">{user.nama_lengkap}</TableCell>
+                  <TableCell className="text-slate-400 font-mono text-sm">{user.username}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      user.status_aktif
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user.role === 'ADMIN'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                        : user.role === 'PETUGAS'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                     }`}>
-                      {user.status_aktif ? 'Aktif' : 'Tidak Aktif'}
+                      {user.role}
                     </span>
                   </TableCell>
-                  <TableCell>{formatDateTime(user.created_at)}</TableCell>
+                  <TableCell>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user.status_aktif
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
+                      {user.status_aktif ? '• Aktif' : '• Tidak Aktif'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-400 text-sm">{formatDateTime(user.created_at)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(user)}>
+                      <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors" onClick={() => handleEdit(user)}>
                         Edit
                       </Button>
-                      <Button size="sm" variant="danger" onClick={() => handleDelete(user.id_user)}>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(user.id_user)}>
                         Hapus
                       </Button>
                     </div>
@@ -196,65 +206,83 @@ export default function UsersPage() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">
-              {editingUser ? 'Edit User' : 'Tambah User'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Nama Lengkap"
-                value={formData.nama_lengkap}
-                onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
-                required
-              />
-              <Input
-                label="Username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                required
-              />
-              <Input
-                label={editingUser ? 'Password (kosongkan jika tidak diubah)' : 'Password'}
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required={!editingUser}
-              />
-              <Select
-                label="Role"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                options={[
-                  { value: 'ADMIN', label: 'Admin' },
-                  { value: 'PETUGAS', label: 'Petugas' },
-                  { value: 'OWNER', label: 'Owner' },
-                ]}
-                required
-              />
-              <Select
-                label="Status Aktif"
-                value={formData.status_aktif ? 'true' : 'false'}
-                onChange={(e) => setFormData({ ...formData, status_aktif: e.target.value === 'true' })}
-                options={[
-                  { value: 'true', label: 'Aktif' },
-                  { value: 'false', label: 'Tidak Aktif' },
-                ]}
-                required
-              />
-              <div className="flex space-x-4">
-                <Button type="submit" variant="primary" className="flex-1">
-                  {editingUser ? 'Update' : 'Tambah'}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => { setShowModal(false); resetForm(); }}>
-                  Batal
-                </Button>
-              </div>
-            </form>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl p-6 max-w-md w-full border border-slate-700/50 shadow-2xl">
+            <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-cyan-500/5 rounded-2xl"></div>
+            <div className="relative">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {editingUser ? 'Edit User' : 'Tambah User'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    value={formData.nama_lengkap}
+                    onChange={(e) => setFormData({ ...formData, nama_lengkap: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Username</label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">{editingUser ? 'Password (kosongkan jika tidak diubah)' : 'Password'}</label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    required={!editingUser}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Role</label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    required
+                  >
+                    <option value="ADMIN">Admin</option>
+                    <option value="PETUGAS">Petugas</option>
+                    <option value="OWNER">Owner</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Status Aktif</label>
+                  <select
+                    value={formData.status_aktif ? 'true' : 'false'}
+                    onChange={(e) => setFormData({ ...formData, status_aktif: e.target.value === 'true' })}
+                    className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    required
+                  >
+                    <option value="true">Aktif</option>
+                    <option value="false">Tidak Aktif</option>
+                  </select>
+                </div>
+                <div className="flex space-x-4 pt-4">
+                  <button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium py-2 rounded-lg transition-all">
+                    {editingUser ? 'Update' : 'Tambah'}
+                  </button>
+                  <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-lg transition-all border border-slate-600/50">
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
