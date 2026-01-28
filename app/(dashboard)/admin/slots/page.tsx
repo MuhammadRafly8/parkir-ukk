@@ -212,64 +212,69 @@ export default function SlotsPage() {
       )}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                <TableHeaderCell className="text-slate-300 font-semibold">Nama Area</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Kapasitas</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Terisi</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Tersedia</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Status</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {areas.map((area) => {
-                const tersedia = area.kapasitas - area.terisi
-                const persentase = area.kapasitas > 0 ? (area.terisi / area.kapasitas) * 100 : 0
-                return (
-                  <TableRow key={area.id_area} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                    <TableCell className="text-slate-100 font-semibold">{area.nama_area}</TableCell>
-                    <TableCell className="text-slate-400">{area.kapasitas}</TableCell>
-                    <TableCell className="text-slate-100">{area.terisi}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded text-sm font-medium ${tersedia === 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                        {tersedia}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-full bg-slate-700/50 rounded-full h-2 max-w-25">
-                          <div
-                            className={`h-2 rounded-full transition-all ${persentase >= 100 ? 'bg-gradient-to-r from-red-600 to-red-500' : persentase >= 80 ? 'bg-gradient-to-r from-yellow-600 to-yellow-500' : 'bg-gradient-to-r from-emerald-600 to-emerald-500'}`}
-                            style={{ width: `${Math.min(persentase, 100)}%` }}
-                          ></div>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+              <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Nama Area</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Kapasitas</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell">Terisi</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden lg:table-cell">Status</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden xl:table-cell">Tanggal Dibuat</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Aksi</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {areas.map((area) => {
+              const tersedia = area.kapasitas - area.terisi
+              const persentase = area.kapasitas > 0 ? (area.terisi / area.kapasitas) * 100 : 0
+              return (
+                <TableRow key={area.id_area} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell className="text-slate-100 font-semibold pl-4 sm:pl-6">
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                      <span className="font-bold text-base truncate">{area.nama_area}</span>
+                      <div className="sm:hidden space-y-1 text-xs">
+                        <div className="text-slate-400">
+                          <span className="font-semibold text-slate-300">Kapasitas:</span> {area.kapasitas}
                         </div>
-                        <span className="text-xs text-slate-400 min-w-8.75">{persentase.toFixed(0)}%</span>
+                        <div className="text-slate-400">
+                          <span className="font-semibold text-slate-300">Terisi:</span> {area.terisi} / {area.kapasitas}
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-slate-400 text-sm">{formatDateTime(area.created_at)}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors" onClick={() => handleViewVehicles(area)}>
-                          Kendaraan
-                        </Button>
-                        <Button size="sm" className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 transition-colors" onClick={() => handleEdit(area)}>
-                          Edit
-                        </Button>
-                        <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(area.id_area)}>
-                          Hapus
-                        </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-slate-400 hidden sm:table-cell">{area.kapasitas}</TableCell>
+                  <TableCell className="text-slate-100 hidden md:table-cell">{area.terisi}</TableCell>
+                  <TableCell className="hidden lg:table-cell">
+                    <div className="flex items-center gap-2">
+                      <div className="w-full bg-slate-700/50 rounded-full h-2 max-w-xs min-w-20">
+                        <div
+                          className={`h-2 rounded-full transition-all ${persentase >= 100 ? 'bg-gradient-to-r from-red-600 to-red-500' : persentase >= 80 ? 'bg-gradient-to-r from-yellow-600 to-yellow-500' : 'bg-gradient-to-r from-emerald-600 to-emerald-500'}`}
+                          style={{ width: `${Math.min(persentase, 100)}%` }}
+                        ></div>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                      <span className="text-xs text-slate-400 w-10 text-right">{persentase.toFixed(0)}%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-slate-400 text-sm hidden xl:table-cell">{formatDateTime(area.created_at)}</TableCell>
+                  <TableCell className="pr-2 sm:pr-6">
+                    <div className="flex flex-col sm:flex-row gap-1 justify-end">
+                      <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleViewVehicles(area)}>
+                        <span className="hidden sm:inline">Kendaraan</span>
+                        <span className="sm:hidden">Kend</span>
+                      </Button>
+                      <Button size="sm" className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleEdit(area)}>
+                        Edit
+                      </Button>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleDelete(area.id_area)}>
+                        Hapus
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
 
       {showModal && (

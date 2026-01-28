@@ -12,10 +12,16 @@ import {
   MapPinIcon,
   TruckIcon,
   DocumentTextIcon,
+  ChartBarIcon,
+  BellIcon,
+  CheckCircleIcon,
 } from '@heroicons/react/24/outline'
 
 const navItems = [
   { name: 'Dashboard', href: '/admin', icon: <HomeIcon className="w-5 h-5" /> },
+  { name: 'Analytics', href: '/admin/analytics', icon: <ChartBarIcon className="w-5 h-5" /> },
+  { name: 'Alerts', href: '/admin/alerts', icon: <BellIcon className="w-5 h-5" /> },
+  { name: 'Slots Parkir', href: '/admin/slots-management', icon: <CheckCircleIcon className="w-5 h-5" /> },
   { name: 'Kelola User', href: '/admin/users', icon: <UserGroupIcon className="w-5 h-5" /> },
   { name: 'Tarif Parkir', href: '/admin/tariffs', icon: <CurrencyDollarIcon className="w-5 h-5" /> },
   { name: 'Area Parkir', href: '/admin/slots', icon: <MapPinIcon className="w-5 h-5" /> },

@@ -9,6 +9,7 @@ import {
   HomeIcon,
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
+  BellIcon,
 } from '@heroicons/react/24/outline'
 
 const navItems = [

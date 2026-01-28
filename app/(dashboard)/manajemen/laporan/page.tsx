@@ -219,109 +219,126 @@ export default function LaporanPage() {
           {/* Summary Tables */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* By Vehicle Type */}
-            <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600/80 transition-all duration-300">
+            <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6 hover:border-slate-600/80 transition-all duration-300">
               <div className="absolute inset-0 bg-linear-to-br from-purple-500/5 to-pink-500/5"></div>
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white mb-4">Ringkasan per Jenis Kendaraan</h3>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                        <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
-                        <TableHeaderCell className="text-slate-300 font-semibold">Jumlah</TableHeaderCell>
-                        <TableHeaderCell className="text-slate-300 font-semibold">Total Biaya</TableHeaderCell>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                      <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Jumlah</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold">Biaya</TableHeaderCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(laporan.summary.summaryByJenis).map(([jenis, data]) => (
+                      <TableRow key={jenis} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                        <TableCell className="text-slate-100">
+                          <div className="flex flex-col gap-1">
+                            <span>{jenis}</span>
+                            <div className="sm:hidden text-xs text-slate-400">
+                              <span className="font-semibold text-slate-300">{data.count}</span> transaksi
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-slate-100 font-semibold hidden sm:table-cell">{data.count}</TableCell>
+                        <TableCell className="text-emerald-400 font-semibold">{formatCurrency(data.total)}</TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {Object.entries(laporan.summary.summaryByJenis).map(([jenis, data]) => (
-                        <TableRow key={jenis} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                          <TableCell className="text-slate-100">{jenis}</TableCell>
-                          <TableCell className="text-slate-100 font-semibold">{data.count}</TableCell>
-                          <TableCell className="text-emerald-400 font-semibold">{formatCurrency(data.total)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </div>
 
             {/* By Area */}
-            <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600/80 transition-all duration-300">
+            <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6 hover:border-slate-600/80 transition-all duration-300">
               <div className="absolute inset-0 bg-linear-to-br from-cyan-500/5 to-blue-500/5"></div>
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white mb-4">Ringkasan per Area Parkir</h3>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                        <TableHeaderCell className="text-slate-300 font-semibold">Area</TableHeaderCell>
-                        <TableHeaderCell className="text-slate-300 font-semibold">Jumlah</TableHeaderCell>
-                        <TableHeaderCell className="text-slate-300 font-semibold">Total Biaya</TableHeaderCell>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                      <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Area</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Jumlah</TableHeaderCell>
+                      <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Biaya</TableHeaderCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(laporan.summary.summaryByArea).map(([area, data]) => (
+                      <TableRow key={area} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                        <TableCell className="text-slate-100 pl-4 sm:pl-6">
+                          <div className="flex flex-col gap-1 min-w-0">
+                            <span className="truncate font-semibold">{area}</span>
+                            <div className="sm:hidden text-xs text-slate-400">
+                              <span className="font-semibold text-slate-300">{data.count}</span> transaksi
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-slate-100 font-semibold hidden sm:table-cell">{data.count}</TableCell>
+                        <TableCell className="text-blue-400 font-semibold pr-2 sm:pr-6">{formatCurrency(data.total)}</TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {Object.entries(laporan.summary.summaryByArea).map(([area, data]) => (
-                        <TableRow key={area} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                          <TableCell className="text-slate-100">{area}</TableCell>
-                          <TableCell className="text-slate-100 font-semibold">{data.count}</TableCell>
-                          <TableCell className="text-blue-400 font-semibold">{formatCurrency(data.total)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </div>
           </div>
 
           {/* Detail Transactions */}
-          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-6 hover:border-slate-600/80 transition-all duration-300">
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-6 hover:border-slate-600/80 transition-all duration-300">
             <div className="absolute inset-0 bg-linear-to-br from-slate-800/50 to-slate-900/50"></div>
             <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-bl from-blue-500/20 rounded-full -mr-20 -mt-20"></div>
             
             <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 className="text-lg font-semibold text-white">Detail Transaksi</h3>
                 <Button 
                   onClick={exportExcel}
-                  className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 flex items-center gap-2"
+                  className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 flex items-center gap-2 w-full sm:w-auto justify-center"
                 >
                   <DocumentArrowDownIcon className="w-5 h-5" />
                   Export Excel
                 </Button>
               </div>
 
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                      <TableHeaderCell className="text-slate-300 font-semibold">ID</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Plat Nomor</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Area</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Masuk</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Keluar</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Durasi</TableHeaderCell>
-                      <TableHeaderCell className="text-slate-300 font-semibold">Biaya</TableHeaderCell>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell pl-4 sm:pl-6">ID</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Plat Nomor</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell">Jenis</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden lg:table-cell">Area</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden xl:table-cell">Masuk</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden xl:table-cell">Keluar</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Durasi</TableHeaderCell>
+                    <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Biaya</TableHeaderCell>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {laporan.transaksi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((t) => (
+                    <TableRow key={t.id_parkir} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                      <TableCell className="text-slate-100 font-mono text-sm hidden sm:table-cell pl-4 sm:pl-6">{t.id_parkir}</TableCell>
+                      <TableCell className="text-slate-100 font-mono font-semibold pl-4 sm:pl-6">
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <span className="truncate">{t.kendaraan.plat_nomor}</span>
+                          <div className="sm:hidden space-y-1 text-xs">
+                            <div className="text-slate-400">{t.kendaraan.jenis_kendaraan}</div>
+                            <div className="text-slate-400">{t.areaParkir.nama_area}</div>
+                            <div className="text-amber-400 font-semibold">{t.durasi_jam} jam</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-slate-100 hidden md:table-cell text-sm">{t.kendaraan.jenis_kendaraan}</TableCell>
+                      <TableCell className="text-slate-100 hidden lg:table-cell text-sm">{t.areaParkir.nama_area}</TableCell>
+                      <TableCell className="text-slate-400 text-sm hidden xl:table-cell">{formatDateTime(t.waktu_masuk)}</TableCell>
+                      <TableCell className="text-slate-400 text-sm hidden xl:table-cell">{formatDateTime(t.waktu_keluar)}</TableCell>
+                      <TableCell className="text-amber-400 font-semibold hidden sm:table-cell text-sm">{t.durasi_jam} jam</TableCell>
+                      <TableCell className="text-emerald-400 font-semibold pr-2 sm:pr-6">{formatCurrency(t.biaya_total)}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {laporan.transaksi.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((t) => (
-                      <TableRow key={t.id_parkir} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                        <TableCell className="text-slate-100 font-mono text-sm">{t.id_parkir}</TableCell>
-                        <TableCell className="text-slate-100 font-mono font-semibold">{t.kendaraan.plat_nomor}</TableCell>
-                        <TableCell className="text-slate-100">{t.kendaraan.jenis_kendaraan}</TableCell>
-                        <TableCell className="text-slate-100">{t.areaParkir.nama_area}</TableCell>
-                        <TableCell className="text-slate-400 text-sm">{formatDateTime(t.waktu_masuk)}</TableCell>
-                        <TableCell className="text-slate-400 text-sm">{formatDateTime(t.waktu_keluar)}</TableCell>
-                        <TableCell className="text-amber-400 font-semibold">{t.durasi_jam} jam</TableCell>
-                        <TableCell className="text-emerald-400 font-semibold">{formatCurrency(t.biaya_total)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                  ))}
+                </TableBody>
+              </Table>
 
               {/* Pagination */}
               <div className="flex flex-col sm:flex-row items-center justify-between pt-6 mt-6 border-t border-slate-700/30 gap-4">

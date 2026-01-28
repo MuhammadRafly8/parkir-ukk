@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "TipeAlert" ADD VALUE 'KENDARAAN_RUSAK';

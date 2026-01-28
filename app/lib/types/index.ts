@@ -1,6 +1,6 @@
-import { Role, JenisKendaraan, StatusTransaksi } from '@prisma/client'
+import { Role, JenisKendaraan, StatusTransaksi, TipeAlert, Severity } from '@prisma/client'
 
-export type { Role, JenisKendaraan, StatusTransaksi }
+export type { Role, JenisKendaraan, StatusTransaksi, TipeAlert, Severity }
 
 export interface User {
   id_user: number

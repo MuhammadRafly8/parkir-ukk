@@ -29,7 +29,9 @@ model AreaParkir {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  transaksi Transaksi[]
+  transaksi   Transaksi[]
+  alerts      Alert[]
+  slots       SlotParkir[]
 }
 
 model Kendaraan {
@@ -86,6 +88,59 @@ model LogAktivitas {
   waktu_aktivitas DateTime @default(now())
 
   user User @relation(fields: [id_user], references: [id_user])
+}
+
+model Alert {
+  id_alert      Int        @id @default(autoincrement())
+  id_area       Int
+  tipe_alert    TipeAlert
+  pesan         String     @db.VarChar(255)
+  severity      Severity   @default(WARNING)
+  is_read       Boolean    @default(false)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+
+  areaParkir AreaParkir @relation(fields: [id_area], references: [id_area])
+
+  @@index([id_area])
+  @@index([is_read])
+}
+
+model SlotParkir {
+  id_slot      Int      @id @default(autoincrement())
+  id_area      Int
+  nomor_slot   String   @db.VarChar(10)
+  status       StatusSlot @default(TERSEDIA)
+  reserved     Boolean  @default(false)
+  id_transaksi Int?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  areaParkir AreaParkir @relation(fields: [id_area], references: [id_area])
+
+  @@unique([id_area, nomor_slot])
+  @@index([id_area])
+  @@index([status])
+}
+
+enum TipeAlert {
+  AREA_FULL
+  AREA_ALMOST_FULL
+  SLOT_AVAILABLE
+  SYSTEM_WARNING
+  KENDARAAN_RUSAK
+}
+
+enum Severity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum StatusSlot {
+  TERSEDIA
+  TERISI
+  MAINTENANCE
 }
 
 enum Role {

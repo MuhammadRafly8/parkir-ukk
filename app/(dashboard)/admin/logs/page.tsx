@@ -66,15 +66,15 @@ export default function LogsPage() {
       </div>
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-slate-700/50 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="p-3 sm:p-4 border-b border-slate-700/50 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <div className="flex-1">
               <label className="text-xs font-medium text-slate-400 mb-2 block">Tanggal Mulai</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 sm:px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
               />
             </div>
             <div className="flex-1">
@@ -83,43 +83,49 @@ export default function LogsPage() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                className="w-full bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 sm:px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
               />
             </div>
             <div className="flex items-end">
-              <Button onClick={handleFilter} className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white border-0">Filter</Button>
+              <Button onClick={handleFilter} className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white border-0 w-full sm:w-auto">Filter</Button>
             </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                <TableHeaderCell className="text-slate-300 font-semibold">Waktu</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">User</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Aktivitas</TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.map((log) => (
-                <TableRow key={log.id_log} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                  <TableCell className="text-slate-400 text-sm">{formatDateTime(log.waktu_aktivitas)}</TableCell>
-                  <TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+              <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell pl-4 sm:pl-6">Waktu</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">User</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell pr-2 sm:pr-6">Aktivitas</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {logs.map((log) => (
+              <TableRow key={log.id_log} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                <TableCell className="hidden sm:table-cell text-slate-400 text-sm pl-4 sm:pl-6">{formatDateTime(log.waktu_aktivitas)}</TableCell>
+                <TableCell className="pl-4 sm:pl-6">
+                  <div className="flex flex-col gap-2">
                     <div>
                       <div className="font-medium text-slate-100">{log.user?.nama_lengkap || '-'}</div>
                       <div className="text-xs text-slate-500">{log.user?.username || '-'}</div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                      {log.aktivitas}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                    <div className="sm:hidden space-y-1">
+                      <div className="text-xs text-slate-400">{formatDateTime(log.waktu_aktivitas)}</div>
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 truncate">
+                        {log.aktivitas}
+                      </span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden md:table-cell pr-2 sm:pr-6">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 truncate inline-block">
+                    {log.aktivitas}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )

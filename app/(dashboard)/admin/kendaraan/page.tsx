@@ -223,56 +223,66 @@ export default function KendaraanPage() {
       )}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-slate-700/50">
+        <div className="p-3 sm:p-4 border-b border-slate-700/50">
           <input
             type="text"
             value={searchPlat}
             onChange={(e) => setSearchPlat(e.target.value)}
             placeholder="Cari plat nomor..."
-            className="w-full max-w-md bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            className="w-full sm:max-w-md bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
           />
         </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-                <TableHeaderCell className="text-slate-300 font-semibold">Plat Nomor</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Jenis</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Warna</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Pemilik</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">User</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
-                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {kendaraan.map((k) => (
-                <TableRow key={k.id_kendaraan} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                  <TableCell className="text-slate-100 font-mono font-semibold">{k.plat_nomor}</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 rounded bg-slate-800/50 text-slate-300 text-xs font-medium">
-                      {k.jenis_kendaraan}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-slate-400">{k.warna}</TableCell>
-                  <TableCell className="text-slate-100">{k.pemilik}</TableCell>
-                  <TableCell className="text-slate-400">{k.user?.nama_lengkap || '-'}</TableCell>
-                  <TableCell className="text-slate-400 text-sm">{formatDateTime(k.created_at)}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 transition-colors" onClick={() => handleEdit(k)}>
-                        Edit
-                      </Button>
-                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(k.id_kendaraan)}>
-                        Hapus
-                      </Button>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+              <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Plat Nomor</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Jenis</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell">Warna</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden lg:table-cell">Pemilik</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden lg:table-cell">User</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold hidden xl:table-cell">Tanggal Dibuat</TableHeaderCell>
+              <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Aksi</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {kendaraan.map((k) => (
+              <TableRow key={k.id_kendaraan} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                <TableCell className="text-slate-100 font-mono font-semibold pl-4 sm:pl-6">
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    <span className="truncate">{k.plat_nomor}</span>
+                    <div className="sm:hidden space-y-1">
+                      <div className="text-xs text-slate-400">
+                        <span className="font-semibold text-slate-300">Jenis:</span> {k.jenis_kendaraan}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        <span className="font-semibold text-slate-300">Warna:</span> {k.warna}
+                      </div>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </div>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell">
+                  <span className="px-2 py-1 rounded bg-slate-800/50 text-slate-300 text-xs font-medium">
+                    {k.jenis_kendaraan}
+                  </span>
+                </TableCell>
+                <TableCell className="text-slate-400 hidden md:table-cell text-sm">{k.warna}</TableCell>
+                <TableCell className="text-slate-100 hidden lg:table-cell text-sm">{k.pemilik}</TableCell>
+                <TableCell className="text-slate-400 hidden lg:table-cell text-sm">{k.user?.nama_lengkap || '-'}</TableCell>
+                <TableCell className="text-slate-400 text-sm hidden xl:table-cell">{formatDateTime(k.created_at)}</TableCell>
+                <TableCell className="pr-2 sm:pr-6">
+                  <div className="flex flex-col sm:flex-row gap-1 justify-end">
+                    <Button size="sm" className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleEdit(k)}>
+                      Edit
+                    </Button>
+                    <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleDelete(k.id_kendaraan)}>
+                      Hapus
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
 
       {showModal && (
