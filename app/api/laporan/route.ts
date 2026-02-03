@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate summary
     const totalTransaksi = transaksi.length
-    const totalPendapatan = transaksi.reduce((sum, t) => {
+    const totalPendapatan = transaksi.reduce((sum: number, t) => {
       return sum + (t.biaya_total ? Number(t.biaya_total) : 0)
     }, 0)
 
