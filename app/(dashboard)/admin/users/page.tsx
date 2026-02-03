@@ -154,73 +154,59 @@ export default function UsersPage() {
       )}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-              <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Nama Lengkap</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Username</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell">Role</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden lg:table-cell">Status</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden xl:table-cell">Tanggal Dibuat</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Aksi</TableHeaderCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id_user} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                <TableCell className="text-slate-100 pl-4 sm:pl-6">
-                  <div className="flex flex-col gap-1.5 min-w-0">
-                    <span className="font-semibold truncate">{user.nama_lengkap}</span>
-                    <div className="sm:hidden space-y-1">
-                      <div className="text-xs text-slate-400 font-mono truncate">{user.username}</div>
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium w-fit ${
-                        user.role === 'ADMIN'
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                          : user.role === 'PETUGAS'
-                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-slate-400 font-mono text-sm hidden sm:table-cell">{user.username}</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    user.role === 'ADMIN'
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                      : user.role === 'PETUGAS'
-                      ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                  }`}>
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell className="hidden lg:table-cell">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    user.status_aktif
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
-                    {user.status_aktif ? '• Aktif' : '• Tidak Aktif'}
-                  </span>
-                </TableCell>
-                <TableCell className="text-slate-400 text-sm hidden xl:table-cell">{formatDateTime(user.created_at)}</TableCell>
-                <TableCell className="pr-2 sm:pr-6">
-                  <div className="flex flex-col sm:flex-row gap-1 justify-end">
-                    <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleEdit(user)}>
-                      Edit
-                    </Button>
-                    <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleDelete(user.id_user)}>
-                      Hapus
-                    </Button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                <TableHeaderCell className="text-slate-300 font-semibold">Nama Lengkap</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Username</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Role</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Status</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id_user} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell className="text-slate-100">{user.nama_lengkap}</TableCell>
+                  <TableCell className="text-slate-400 font-mono text-sm">{user.username}</TableCell>
+                  <TableCell>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user.role === 'ADMIN'
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                        : user.role === 'PETUGAS'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user.status_aktif
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
+                      {user.status_aktif ? '• Aktif' : '• Tidak Aktif'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-400 text-sm">{formatDateTime(user.created_at)}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button size="sm" className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 transition-colors" onClick={() => handleEdit(user)}>
+                        Edit
+                      </Button>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(user.id_user)}>
+                        Hapus
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {showModal && (

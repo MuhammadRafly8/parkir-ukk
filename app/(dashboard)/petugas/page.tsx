@@ -3,20 +3,7 @@
 import { useEffect, useState } from 'react'
 import { LoadingSpinner } from '@/app/components/shared/LoadingSpinner'
 import Link from 'next/link'
-import { ArrowDownCircleIcon, ArrowUpCircleIcon, ClockIcon, CalendarIcon, BellIcon, XMarkIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
-
-interface Alert {
-  id_alert: number
-  id_area: number
-  tipe_alert: string
-  pesan: string
-  severity: string
-  is_read: boolean
-  created_at: string
-  areaParkir: {
-    nama_area: string
-  }
-}
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline'
 
 export default function PetugasDashboard() {
   const [stats, setStats] = useState({
@@ -24,14 +11,9 @@ export default function PetugasDashboard() {
     totalToday: 0,
   })
   const [loading, setLoading] = useState(true)
-  const [showAlertsModal, setShowAlertsModal] = useState(false)
-  const [alerts, setAlerts] = useState<Alert[]>([])
-  const [alertsLoading, setAlertsLoading] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
     fetchStats()
-    fetchUnreadCount()
   }, [])
 
   const fetchStats = async () => {
@@ -60,70 +42,6 @@ export default function PetugasDashboard() {
     }
   }
 
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await fetch('/api/alerts?unread_only=true')
-      const data = await response.json()
-      setUnreadCount(Array.isArray(data) ? data.length : 0)
-    } catch (error) {
-      console.error('Error fetching unread count:', error)
-    }
-  }
-
-  const openAlertsModal = async () => {
-    setShowAlertsModal(true)
-    setAlertsLoading(true)
-    try {
-      const response = await fetch('/api/alerts')
-      const data = await response.json()
-      setAlerts(Array.isArray(data) ? data : [])
-    } catch (error) {
-      console.error('Error fetching alerts:', error)
-    } finally {
-      setAlertsLoading(false)
-    }
-  }
-
-  const markAsRead = async (alertId: number) => {
-    try {
-      await fetch(`/api/alerts?id=${alertId}`, {
-        method: 'PATCH',
-      })
-      setAlerts(alerts.map(alert =>
-        alert.id_alert === alertId ? { ...alert, is_read: true } : alert
-      ))
-      setUnreadCount(Math.max(0, unreadCount - 1))
-    } catch (error) {
-      console.error('Error marking alert as read:', error)
-    }
-  }
-
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'CRITICAL':
-        return <XCircleIcon className="w-5 h-5 text-red-500" />
-      case 'WARNING':
-        return <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500" />
-      case 'INFO':
-        return <InformationCircleIcon className="w-5 h-5 text-blue-500" />
-      default:
-        return <BellIcon className="w-5 h-5 text-gray-500" />
-    }
-  }
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'CRITICAL':
-        return 'border-red-500/50 bg-red-500/10'
-      case 'WARNING':
-        return 'border-yellow-500/50 bg-yellow-500/10'
-      case 'INFO':
-        return 'border-blue-500/50 bg-blue-500/10'
-      default:
-        return 'border-gray-500/50 bg-gray-500/10'
-    }
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
@@ -136,27 +54,12 @@ export default function PetugasDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header Section */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white">
-              Dashboard Petugas
-            </h1>
-            <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></div>
-            <p className="text-slate-300 text-lg">Kelola transaksi parkir dengan mudah dan efisien</p>
-          </div>
-
-          {/* Alerts Button */}
-          <button
-            onClick={openAlertsModal}
-            className="relative p-3 bg-slate-800/80 hover:bg-slate-700/80 rounded-2xl border border-slate-700/50 transition-all duration-300 group"
-          >
-            <BellIcon className="w-6 h-6 text-slate-300 group-hover:text-blue-400 transition-colors" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
+        <div className="space-y-2">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white">
+            Dashboard Petugas
+          </h1>
+          <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-full"></div>
+          <p className="text-slate-300 text-lg">Kelola transaksi parkir dengan mudah dan efisien</p>
         </div>
 
         {/* Stats Cards */}

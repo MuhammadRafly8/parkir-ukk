@@ -159,45 +159,41 @@ export default function TariffsPage() {
       )}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
-              <TableHeaderCell className="text-slate-300 font-semibold pl-4 sm:pl-6">Jenis Kendaraan</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden sm:table-cell">Tarif per Jam</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold hidden md:table-cell">Tanggal Dibuat</TableHeaderCell>
-              <TableHeaderCell className="text-slate-300 font-semibold pr-2 sm:pr-6">Aksi</TableHeaderCell>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tarifs.map((tarif) => (
-              <TableRow key={tarif.id_tarif} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                <TableCell className="pl-4 sm:pl-6">
-                  <div className="flex flex-col gap-1.5 min-w-0">
-                    <span className="px-3 py-1 rounded bg-amber-500/20 text-amber-300 text-sm font-medium border border-amber-500/30 w-fit">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-800/50 border-b border-slate-700/50">
+                <TableHeaderCell className="text-slate-300 font-semibold">Jenis Kendaraan</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tarif per Jam</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Tanggal Dibuat</TableHeaderCell>
+                <TableHeaderCell className="text-slate-300 font-semibold">Aksi</TableHeaderCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tarifs.map((tarif) => (
+                <TableRow key={tarif.id_tarif} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                  <TableCell>
+                    <span className="px-3 py-1 rounded bg-amber-500/20 text-amber-300 text-sm font-medium border border-amber-500/30">
                       {tarif.jenis_kendaraan}
                     </span>
-                    <div className="sm:hidden space-y-1">
-                      <div className="text-xs text-slate-100 font-semibold">{formatCurrency(tarif.tarif_per_jam)}</div>
-                      <div className="text-xs text-slate-400">{formatDateTime(tarif.created_at)}</div>
+                  </TableCell>
+                  <TableCell className="text-slate-100 font-semibold">{formatCurrency(tarif.tarif_per_jam)}</TableCell>
+                  <TableCell className="text-slate-400 text-sm">{formatDateTime(tarif.created_at)}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button size="sm" className="bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 transition-colors" onClick={() => handleEdit(tarif)}>
+                        Edit
+                      </Button>
+                      <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors" onClick={() => handleDelete(tarif.id_tarif)}>
+                        Hapus
+                      </Button>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-slate-100 font-semibold hidden sm:table-cell">{formatCurrency(tarif.tarif_per_jam)}</TableCell>
-                <TableCell className="text-slate-400 text-sm hidden md:table-cell">{formatDateTime(tarif.created_at)}</TableCell>
-                <TableCell className="pr-2 sm:pr-6">
-                  <div className="flex flex-col sm:flex-row gap-1 justify-end">
-                    <Button size="sm" className="bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleEdit(tarif)}>
-                      Edit
-                    </Button>
-                    <Button size="sm" className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 transition-colors text-xs sm:text-sm whitespace-nowrap" onClick={() => handleDelete(tarif.id_tarif)}>
-                      Hapus
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {showModal && (
