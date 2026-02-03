@@ -2,6 +2,6 @@
 
 import 'dotenv/config';
 
-// This config is optional - Prisma reads from .env by default
-// Exporting an empty config to avoid environment variable errors during build
+// Prisma 7 config - kept minimal
+// Database configuration happens in PrismaClient initialization
 export default {};
