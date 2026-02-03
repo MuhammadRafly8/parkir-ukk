@@ -16,7 +16,7 @@ export async function GET() {
       orderBy: { jenis_kendaraan: 'asc' },
     })
 
-    return NextResponse.json(tarifs.map(t => ({
+    return NextResponse.json(tarifs.map((t: typeof tarifs[0]) => ({
       ...t,
       tarif_per_jam: Number(t.tarif_per_jam),
     })))

@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
       take: 100,
     })
 
-    return NextResponse.json(transaksi.map(t => ({
+    return NextResponse.json(transaksi.map((t: typeof transaksi[0]) => ({
       ...t,
       tarif: {
         ...t.tarif,

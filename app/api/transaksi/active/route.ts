@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
         orderBy: { waktu_masuk: 'desc' },
       })
 
-      return NextResponse.json(transaksiList.map(t => ({
+      return NextResponse.json(transaksiList.map((t: typeof transaksiList[0]) => ({
         ...t,
         tarif: {
           ...t.tarif,

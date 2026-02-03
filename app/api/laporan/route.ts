@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         summaryByJenis,
         summaryByArea,
       },
-      transaksi: transaksi.map(t => ({
+      transaksi: transaksi.map((t: typeof transaksi[0]) => ({
         ...t,
         tarif: {
           ...t.tarif,
