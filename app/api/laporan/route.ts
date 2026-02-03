@@ -58,11 +58,11 @@ export async function GET(request: NextRequest) {
 
     // Calculate summary
     const totalTransaksi = transaksi.length
-    const totalPendapatan = transaksi.reduce((sum: number, t) => {
+    const totalPendapatan = transaksi.reduce((sum: number, t: typeof transaksi[0]) => {
       return sum + (t.biaya_total ? Number(t.biaya_total) : 0)
     }, 0)
 
-    const summaryByJenis = transaksi.reduce((acc: any, t) => {
+    const summaryByJenis = transaksi.reduce((acc: Record<string, { count: number; total: number }>, t: typeof transaksi[0]) => {
       const jenis = t.kendaraan.jenis_kendaraan
       if (!acc[jenis]) {
         acc[jenis] = { count: 0, total: 0 }
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       return acc
     }, {})
 
-    const summaryByArea = transaksi.reduce((acc: any, t) => {
+    const summaryByArea = transaksi.reduce((acc: Record<string, { count: number; total: number }>, t: typeof transaksi[0]) => {
       const area = t.areaParkir.nama_area
       if (!acc[area]) {
         acc[area] = { count: 0, total: 0 }
