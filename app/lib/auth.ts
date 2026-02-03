@@ -1,6 +1,6 @@
 import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
-import { Role } from '@prisma/client'
+import { Role } from './types/enums'
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10)

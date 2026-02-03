@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/app/lib/prisma'
-import { StatusTransaksi } from '@prisma/client'
+import { StatusTransaksi } from '@/app/lib/types/enums'
 import { cookies } from 'next/headers'
 
 async function getSession() {

@@ -1,4 +1,4 @@
-import { Role, JenisKendaraan, StatusTransaksi } from '@prisma/client'
+import { Role, JenisKendaraan, StatusTransaksi } from './enums'
 
 export type { Role, JenisKendaraan, StatusTransaksi }
 

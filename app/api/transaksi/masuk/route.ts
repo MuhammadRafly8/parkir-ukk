@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/app/lib/prisma'
 import { createActivityLog } from '@/app/lib/auth'
 import { cookies } from 'next/headers'
-import { StatusTransaksi } from '@prisma/client'
+import { StatusTransaksi } from '@/app/lib/types/enums'
 
 async function getSession() {
   const cookieStore = await cookies()
