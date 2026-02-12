@@ -5,12 +5,29 @@ import { LoadingSpinner } from '@/app/components/shared/LoadingSpinner'
 import Link from 'next/link'
 import { ArrowDownCircleIcon, ArrowUpCircleIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline'
 
+interface TransactionData {
+  id_parkir: number
+  biaya_total: number
+  user: {
+    id_user: number
+    nama_lengkap: string
+    username: string
+  }
+}
+
+interface OfficerRevenue {
+  totalRevenue: number
+  transactionCount: number
+}
+
 export default function PetugasDashboard() {
   const [stats, setStats] = useState({
     activeTransaksi: 0,
     totalToday: 0,
   })
+  const [officerRevenue, setOfficerRevenue] = useState<OfficerRevenue | null>(null)
   const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
     fetchStats()
@@ -18,28 +35,64 @@ export default function PetugasDashboard() {
 
   const fetchStats = async () => {
     try {
+      // Get current user session
+      const sessionRes = await fetch('/api/auth/session')
+      const sessionData = await sessionRes.json()
+      const session = sessionData.user
+      setCurrentUser(session)
+
       const todayDate = new Date()
       todayDate.setHours(0, 0, 0, 0)
       const tomorrow = new Date(todayDate)
       tomorrow.setDate(tomorrow.getDate() + 1)
 
-      const [activeRes, todayRes] = await Promise.all([
+      const [activeRes, keluar] = await Promise.all([
         fetch('/api/transaksi/active'),
-        fetch(`/api/transaksi?start_date=${todayDate.toISOString()}&end_date=${tomorrow.toISOString()}`),
+        fetch(`/api/transaksi?status=KELUAR&start_date=${todayDate.toISOString()}&end_date=${tomorrow.toISOString()}`),
       ])
 
       const active = await activeRes.json()
-      const todayData = await todayRes.json()
+      const keluarData = await keluar.json()
+
+      // Filter dan hitung hanya untuk petugas yang login
+      let totalRevenue = 0
+      let transactionCount = 0
+
+      if (Array.isArray(keluarData) && session?.id_user) {
+        keluarData.forEach((transaksi: TransactionData) => {
+          if (transaksi.user.id_user === session.id_user) {
+            const amount = transaksi.biaya_total || 0
+            totalRevenue += amount
+            transactionCount += 1
+          }
+        })
+      }
 
       setStats({
         activeTransaksi: Array.isArray(active) ? active.length : 0,
-        totalToday: Array.isArray(todayData) ? todayData.length : 0,
+        totalToday: Array.isArray(keluarData) ? keluarData.length : 0,
       })
+      
+      if (session?.id_user) {
+        setOfficerRevenue({
+          totalRevenue,
+          transactionCount,
+        })
+      }
     } catch (error) {
       console.error('Error fetching stats:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value)
   }
 
   if (loading) {
@@ -85,7 +138,7 @@ export default function PetugasDashboard() {
             </div>
           </div>
 
-          {/* Today Transactions Card */}
+          {/* Today Revenue Card */}
           <div className="group relative">
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
             <div className="relative bg-slate-800/80 rounded-2xl p-6 sm:p-8 border border-slate-700/50 shadow-lg shadow-emerald-500/5 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 backdrop-blur-sm">
@@ -95,12 +148,12 @@ export default function PetugasDashboard() {
                     <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-xl flex items-center justify-center">
                       <CalendarIcon className="w-6 h-6 text-emerald-400" />
                     </div>
-                    <p className="text-sm font-semibold text-slate-300">Hari Ini</p>
+                    <p className="text-sm font-semibold text-slate-300">Pemasukan Hari Ini</p>
                   </div>
-                  <div className="text-5xl sm:text-6xl font-bold text-white mb-2">
-                    {stats.totalToday}
+                  <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
+                    {formatCurrency(officerRevenue?.totalRevenue || 0)}
                   </div>
-                  <p className="text-sm text-slate-400">Total transaksi</p>
+                  <p className="text-sm text-slate-400">{officerRevenue?.transactionCount || 0} transaksi selesai</p>
                 </div>
               </div>
             </div>
